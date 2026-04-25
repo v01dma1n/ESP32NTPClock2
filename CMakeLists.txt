@@ -4,7 +4,7 @@
 # Provides the base classes (BaseConfig, BasePreferences, BaseAccessPointManager,
 # BaseNtpClockApp), the IDisplayDriver / IAnimation interfaces, the animation
 # library, the FSM, the scene manager, WiFi/NTP/geo helpers, and the quote
-# engine used by VFDWhisperer.
+# engine used by MoodWhisperer.
 
 idf_component_register(
     SRCS
