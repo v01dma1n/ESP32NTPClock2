@@ -1,4 +1,4 @@
-// ESP32NTPClock.h — umbrella header for the VFDWhisperer engine.
+// ESP32NTPClock.h — umbrella header for the MoodWhisperer engine.
 //
 // Matches the Arduino library's umbrella header so app code can port
 // with minimal changes. Apps just:
