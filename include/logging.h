@@ -13,7 +13,7 @@
 // Set in main once preferences are loaded; defaults to INFO until then.
 extern AppLogLevel g_appLogLevel;
 
-#define LOG_TAG "VFDW"
+#define LOG_TAG "NTPC"
 
 // Emit if the runtime level is at or above the line's level. ESP_LOG macros
 // do their own compile-time gating too; this is the *runtime* gate that
