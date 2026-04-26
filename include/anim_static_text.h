@@ -9,7 +9,7 @@
 
 class StaticTextAnimation : public IAnimation {
 public:
-    explicit StaticTextAnimation(std::string text);
+    explicit StaticTextAnimation(std::string text, bool dotsWithPreviousChar = false);
 
     void setup(IDisplayDriver* display) override;
     void update() override;
@@ -17,6 +17,7 @@ public:
 
 private:
     std::string _text;
+    bool        _dotsWithPreviousChar;
     uint32_t    _startTime;
     bool        _rendered;
 };

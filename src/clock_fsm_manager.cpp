@@ -3,10 +3,13 @@
 #include "clock_fsm_manager.h"
 #include "i_base_clock.h"
 #include "display_manager.h"
+#include "anim_static_text.h"
 #include "wifi_connector.h"
 #include "sntp_client.h"
 #include "geo_tz_client.h"
 #include "logging.h"
+
+#include <memory>
 
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
@@ -30,11 +33,12 @@ void ClockFsmManager::setup() {
 
 const char* ClockFsmManager::stateName(ClockState s) const {
     switch (s) {
-        case FSM_STARTUP_ANIM:   return "STARTUP_ANIM";
-        case FSM_WIFI_CONNECT:   return "WIFI_CONNECT";
-        case FSM_NTP_SYNC:       return "NTP_SYNC";
-        case FSM_RUNNING_NORMAL: return "RUNNING_NORMAL";
-        case FSM_AP_MODE:        return "AP_MODE";
+        case FSM_STARTUP_ANIM:    return "STARTUP_ANIM";
+        case FSM_WIFI_CONNECT:    return "WIFI_CONNECT";
+        case FSM_NTP_SYNC:        return "NTP_SYNC";
+        case FSM_NO_WIFI_NOTICE:  return "NO_WIFI_NOTICE";
+        case FSM_RUNNING_NORMAL:  return "RUNNING_NORMAL";
+        case FSM_AP_MODE:         return "AP_MODE";
     }
     return "UNKNOWN";
 }
@@ -104,9 +108,19 @@ void ClockFsmManager::update() {
             if (r == 1) {
                 enter(FSM_RUNNING_NORMAL);
             } else if (r == -1) {
-                // Without an external RTC we can't fake a clock, so fall
-                // back to the setup portal and let the user retry.
-                enter(FSM_AP_MODE);
+                if (_clock.hasRtcTime()) {
+                    _clock.getClock().setAnimation(
+                        std::make_unique<StaticTextAnimation>("NO WIFI"));
+                    enter(FSM_NO_WIFI_NOTICE);
+                } else {
+                    enter(FSM_AP_MODE);
+                }
+            }
+            break;
+        }
+        case FSM_NO_WIFI_NOTICE: {
+            if (elapsedMs > 3000) {
+                enter(FSM_RUNNING_NORMAL);
             }
             break;
         }

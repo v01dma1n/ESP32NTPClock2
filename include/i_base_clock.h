@@ -44,4 +44,8 @@ public:
     // Called by the boot manager / button handler to jump into AP mode.
     // Blocks (inside the app's implementation) until the user saves creds.
     virtual void activateAccessPoint() = 0;
+
+    // True if an external RTC was present and had valid time at boot, meaning
+    // the system clock is already set and NTP failure is non-fatal.
+    virtual bool hasRtcTime() const { return false; }
 };

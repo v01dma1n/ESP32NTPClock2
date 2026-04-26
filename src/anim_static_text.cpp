@@ -1,8 +1,10 @@
 #include "anim_static_text.h"
 #include "anim_time.h"
+#include "anim_utils.h"
 
-StaticTextAnimation::StaticTextAnimation(std::string text)
-    : _text(std::move(text)), _startTime(0), _rendered(false) {}
+StaticTextAnimation::StaticTextAnimation(std::string text, bool dotsWithPreviousChar)
+    : _text(std::move(text)), _dotsWithPreviousChar(dotsWithPreviousChar),
+      _startTime(0), _rendered(false) {}
 
 void StaticTextAnimation::setup(IDisplayDriver* display) {
     IAnimation::setup(display);
@@ -13,13 +15,15 @@ void StaticTextAnimation::setup(IDisplayDriver* display) {
 void StaticTextAnimation::update() {
     if (_rendered) return;
 
-    // Render once into our private buffer and leave it there; isDone()
-    // never returns true, so the scene manager yanks us when its timer
-    // expires.
+    std::string parsedText;
+    std::vector<uint8_t> dotStates;
+    parseTextAndDots(_text, _dotsWithPreviousChar, parsedText, dotStates);
+
     const int cells = _display->getDisplaySize();
     for (int i = 0; i < cells; ++i) {
-        char c = (i < static_cast<int>(_text.size())) ? _text[i] : ' ';
-        setChar(i, c, /*dot=*/false);
+        char c   = (i < static_cast<int>(parsedText.size())) ? parsedText[i] : ' ';
+        bool dot = (i < static_cast<int>(dotStates.size())) && dotStates[i];
+        setChar(i, c, dot);
     }
     _rendered = true;
 }

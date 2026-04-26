@@ -132,7 +132,7 @@ void SceneManager::update() {
 
         // A slot-machine on a live scene would look silly; switch to a
         // static-text animation for the refresh.
-        _app.getClock().setAnimation(std::make_unique<StaticTextAnimation>(text));
+        _app.getClock().setAnimation(std::make_unique<StaticTextAnimation>(text, scene.dots_with_previous));
         _lastLiveUpdateMs = now;
     }
 

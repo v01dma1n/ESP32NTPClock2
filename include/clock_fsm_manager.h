@@ -21,6 +21,7 @@ enum ClockState {
     FSM_STARTUP_ANIM,
     FSM_WIFI_CONNECT,
     FSM_NTP_SYNC,
+    FSM_NO_WIFI_NOTICE,  // RTC present, NTP failed — show message, then run
     FSM_RUNNING_NORMAL,
     FSM_AP_MODE,
 };
