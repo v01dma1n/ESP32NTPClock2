@@ -19,6 +19,7 @@ idf_component_register(
         "src/sntp_client.cpp"
         "src/tz_data.cpp"
         "src/geo_tz_client.cpp"
+        "src/weather_client.cpp"
         "src/anim_static_text.cpp"
         "src/anim_scrolling_text.cpp"
         "src/anim_slot_machine.cpp"
