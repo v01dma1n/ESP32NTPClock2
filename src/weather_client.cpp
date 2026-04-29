@@ -53,7 +53,7 @@ WeatherData fetchWeather(const char* apiKey, const char* city) {
     char url[320];
     std::snprintf(url, sizeof(url),
         "http://api.openweathermap.org/data/2.5/weather"
-        "?q=%s&appid=%s&units=metric",
+        "?q=%s&appid=%s&units=imperial",
         cityEncoded, apiKey);
 
     HttpBuf buf = {};
@@ -102,11 +102,11 @@ WeatherData fetchWeather(const char* apiKey, const char* city) {
         return result;
     }
 
-    result.tempC    = (float)temp->valuedouble;
+    result.tempF    = (float)temp->valuedouble;
     result.humidity = (int)hum->valuedouble;
     result.valid    = true;
 
-    LOGINF("weather: %.1f C, %d %%RH", result.tempC, result.humidity);
+    LOGINF("weather: %.1f F, %d %%RH", result.tempF, result.humidity);
     cJSON_Delete(root);
     return result;
 }

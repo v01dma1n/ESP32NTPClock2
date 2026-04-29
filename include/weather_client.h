@@ -5,7 +5,7 @@
 // app preferences and passed here on each call.
 
 struct WeatherData {
-    float tempC;    // air temperature, Celsius
+    float tempF;    // air temperature, Fahrenheit
     int   humidity; // relative humidity, percent 0-100
     bool  valid;    // false if the last fetch failed
 };
