@@ -1,23 +1,20 @@
 # ESP32 NTP Clock engine component.
 #
 # IDF-native port of https://github.com/v01dma1n/ESP32NTPClock.
-# Provides the base classes (BaseConfig, BasePreferences, BaseAccessPointManager,
-# BaseNtpClockApp), the IDisplayDriver / IAnimation interfaces, the animation
-# library, the FSM, the scene manager, WiFi/NTP/geo helpers, and the quote
-# engine used by MoodWhisperer.
+# Provides the base clock app (BaseNtpClockApp), the IDisplayDriver /
+# IAnimation interfaces, the animation library, the FSM, the scene
+# manager, NTP/geo helpers, weather client, and the quote engine.
+#
+# WiFi connectivity and NVS preferences live in the esp32_wifi component
+# (ESP32WiFi2), which this component depends on.
 
 idf_component_register(
     SRCS
-        "src/base_preferences.cpp"
-        "src/base_access_point_manager.cpp"
         "src/base_ntp_clock_app.cpp"
         "src/clock_fsm_manager.cpp"
         "src/display_manager.cpp"
         "src/scene_manager.cpp"
-        "src/boot_manager.cpp"
-        "src/wifi_connector.cpp"
         "src/sntp_client.cpp"
-        "src/tz_data.cpp"
         "src/geo_tz_client.cpp"
         "src/weather_client.cpp"
         "src/anim_static_text.cpp"
@@ -25,14 +22,13 @@ idf_component_register(
         "src/anim_slot_machine.cpp"
         "src/anim_matrix.cpp"
         "src/quote_manager.cpp"
-        "src/logging.cpp"
         "src/i_display_driver.cpp"
     INCLUDE_DIRS
         "include"
     REQUIRES
+        esp32_wifi
         nvs_flash
         esp_wifi
-        esp_http_server
         esp_http_client
         esp_netif
         esp_event
