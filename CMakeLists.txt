@@ -3,8 +3,7 @@
 # IDF-native port of https://github.com/v01dma1n/ESP32NTPClock.
 # Provides the base classes (BaseConfig, BasePreferences, BaseAccessPointManager,
 # BaseNtpClockApp), the IDisplayDriver / IAnimation interfaces, the animation
-# library, the FSM, the scene manager, WiFi/NTP/geo helpers, and the quote
-# engine used by MoodWhisperer.
+# library, the FSM, the scene manager, and WiFi/NTP/geo helpers.
 
 idf_component_register(
     SRCS
@@ -25,7 +24,6 @@ idf_component_register(
         "src/anim_scrolling_text.cpp"
         "src/anim_slot_machine.cpp"
         "src/anim_matrix.cpp"
-        "src/quote_manager.cpp"
         "src/logging.cpp"
         "src/i_display_driver.cpp"
     INCLUDE_DIRS

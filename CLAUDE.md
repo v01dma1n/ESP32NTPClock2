@@ -88,15 +88,6 @@ are each in their own header under `include/`.
 `UNSET_VALUE` (-999.0f) is the sentinel `getDataValue()` returns when data
 is not yet available; the scene manager renders `---` in that case.
 
-## Quote manager
-
-`QuoteManager` picks from a mood-bucketed table. The mood source is an
-abstract `MoodProvider`; `RandomMoodProvider` is the current default.
-Apps that have a real mood signal (barometric pressure, calendar, etc.)
-subclass `MoodProvider` and pass their implementation to the constructor.
-The built-in quote table is in `quote_manager.cpp`; pass a custom array
-to the constructor to override it.
-
 ## Comments and logs
 
 Match the existing casual, specific voice. Use `LOGINF` / `LOGERR` /

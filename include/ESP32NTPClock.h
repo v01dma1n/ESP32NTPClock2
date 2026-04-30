@@ -1,4 +1,4 @@
-// ESP32NTPClock.h — umbrella header for the MoodWhisperer engine.
+// ESP32NTPClock.h — umbrella header for the NTP clock engine.
 //
 // Matches the Arduino library's umbrella header so app code can port
 // with minimal changes. Apps just:
@@ -39,4 +39,3 @@
 #include "anim_slot_machine.h"
 #include "anim_matrix.h"
 
-#include "quote_manager.h"
