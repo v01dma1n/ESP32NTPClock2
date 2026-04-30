@@ -32,28 +32,29 @@ void SceneManager::setup(const DisplayScene* playlist, int numScenes) {
     _lastLiveUpdateMs  = 0;
 }
 
-void SceneManager::renderCurrentSceneText(char* out, size_t out_size) {
-    if (!_scenePlaylist || _numScenes <= 0) { out[0] = '\0'; return; }
-    const DisplayScene& scene = _scenePlaylist[_currentSceneIndex];
-
-    // Very light heuristic: if the format string contains '%' followed by
-    // a typical strftime specifier letter, use strftime(); otherwise treat
-    // it as a plain snprintf format taking the scene's data value.
-    const char* fmt = scene.format_string ? scene.format_string : "";
-    bool looksLikeStrftime = false;
+// Returns true if fmt contains at least one strftime specifier letter.
+// Used to distinguish time-format scenes from numeric-data scenes.
+static bool isStrftimeFormat(const char* fmt) {
     for (const char* p = fmt; *p; ++p) {
         if (*p == '%' && p[1]) {
             char c = p[1];
             if (c == 'H' || c == 'M' || c == 'S' || c == 'Y' || c == 'y' ||
                 c == 'm' || c == 'd' || c == 'b' || c == 'B' || c == 'a' ||
                 c == 'A' || c == 'j' || c == 'p' || c == 'I') {
-                looksLikeStrftime = true;
-                break;
+                return true;
             }
         }
     }
+    return false;
+}
 
-    if (looksLikeStrftime) {
+void SceneManager::renderCurrentSceneText(char* out, size_t out_size) {
+    if (!_scenePlaylist || _numScenes <= 0) { out[0] = '\0'; return; }
+    const DisplayScene& scene = _scenePlaylist[_currentSceneIndex];
+
+    const char* fmt = scene.format_string ? scene.format_string : "";
+
+    if (isStrftimeFormat(fmt)) {
         time_t now = time(nullptr);
         _app.formatTime(out, out_size, fmt, now);
         return;
@@ -76,6 +77,23 @@ void SceneManager::renderCurrentSceneText(char* out, size_t out_size) {
 
 void SceneManager::startCurrentScene() {
     if (!_scenePlaylist || _numScenes <= 0) return;
+
+    // Skip numeric-data scenes whose getter hasn't produced valid data yet
+    // (e.g. weather scenes before the first fetch). Guard with a full-
+    // playlist walk so we don't loop forever if every scene is unset.
+    for (int guard = 0; guard < _numScenes; ++guard) {
+        const DisplayScene& s = _scenePlaylist[_currentSceneIndex];
+        const char* fmt = s.format_string ? s.format_string : "";
+        if (s.getDataValue &&
+            s.getDataValue() == UNSET_VALUE &&
+            !isStrftimeFormat(fmt) &&
+            std::strchr(fmt, '%') != nullptr) {
+            _currentSceneIndex = (_currentSceneIndex + 1) % _numScenes;
+        } else {
+            break;
+        }
+    }
+
     const DisplayScene& scene = _scenePlaylist[_currentSceneIndex];
 
     char text[MAX_SCENE_TEXT_LEN];
