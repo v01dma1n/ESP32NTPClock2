@@ -32,7 +32,7 @@ void BaseNtpClockApp::setup() {
     // Engine managers. The FSM and scene manager need a reference back
     // to this->IBaseClock, which is available because we are already
     // inside a concrete subclass at this point in the chain.
-    _bootManager  = std::make_unique<BootManager>(*this);
+    _bootManager  = std::make_unique<BootManager>();
     _fsmManager   = std::make_unique<ClockFsmManager>(*this);
     _sceneManager = std::make_unique<SceneManager>(*this);
 

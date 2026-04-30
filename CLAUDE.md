@@ -1,26 +1,26 @@
 # ESP32NTPClock2 — agent instructions
 
 ## Project
-IDF-native NTP clock engine: WiFi connectivity, NVS preferences, captive portal,
-SNTP, display/animation framework, scene manager, weather client, geo-TZ detection,
-and quote manager. Parallel to the Arduino ESP32NTPClock library
-(https://github.com/v01dma1n/ESP32NTPClock).
+IDF-native NTP clock engine: SNTP, display/animation framework, scene manager,
+weather client, and geo-TZ detection. Parallel to the Arduino ESP32NTPClock
+library (https://github.com/v01dma1n/ESP32NTPClock).
 
 This is a component library, not an application — there is no `main.cpp`
 and no standalone `idf.py build` target. Build and test it inside a project
 that has an IDF build system (e.g. MoodWhisperer at
 https://github.com/v01dma1n/MoodWhisperer).
 
-The component is self-contained: it includes its own WiFi layer
-(`wifi_connector`, `base_preferences`, `base_access_point_manager`) and does
-not depend on ESP32WiFi2. Display drivers are supplied separately via
-ESP32NTPClockDrivers2 (https://github.com/v01dma1n/ESP32NTPClockDrivers2),
-which REQUIRES this component for its IDisplayDriver interface.
+WiFi connectivity and NVS preferences live in the `esp32_wifi` component
+(ESP32WiFi2, https://github.com/v01dma1n/ESP32WiFi2), which this component
+depends on. Display drivers are supplied separately via ESP32NTPClockDrivers2
+(https://github.com/v01dma1n/ESP32NTPClockDrivers2), which REQUIRES this
+component for its IDisplayDriver interface.
 
 ## Using in an IDF project
 
-Add as a git submodule under `components/esp32_ntp_clock`, then declare
-`REQUIRES esp32_ntp_clock` in the app component's CMakeLists.txt.
+Add both `esp32_wifi` (ESP32WiFi2) and `esp32_ntp_clock` (this repo) as git
+submodules under `components/`, then declare `REQUIRES esp32_ntp_clock` in the
+app component's CMakeLists.txt — `esp32_wifi` is pulled in transitively.
 Include the umbrella header:
 
     #include "ESP32NTPClock.h"
@@ -80,10 +80,12 @@ call `writeDisplay()` on the driver directly from application code.
 
 ## Types
 
-All shared types (`DisplayScene`, `AnimationType`, `FormField`,
-`PrefSelectOption`, `AppLogLevel`, `PrefType`, `FieldValidation`) live in
-`enc_types.h`. `IDisplayDriver`, `IAnimation`, `IBaseClock`, `IWeatherClock`
-are each in their own header under `include/`.
+Clock/display types (`DisplayScene`, `AnimationType`) live in `enc_types.h`.
+WiFi/preferences types (`FormField`, `PrefSelectOption`, `AppLogLevel`,
+`PrefType`, `FieldValidation`) live in `wifi_types.h` (ESP32WiFi2) and are
+re-exported via `enc_types.h`'s `#include "wifi_types.h"`.
+`IDisplayDriver`, `IAnimation`, `IBaseClock`, `IWeatherClock` are each in
+their own header under `include/`.
 
 `UNSET_VALUE` (-999.0f) is the sentinel `getDataValue()` returns when data
 is not yet available; the scene manager renders `---` in that case.
@@ -104,6 +106,6 @@ Match the existing casual, specific voice. Use `LOGINF` / `LOGERR` /
   string in every app — overflow silently truncates on the display.
 - Don't change `MAX_PREF_STRING_LEN` without coordinating across every app
   that has existing NVS entries — old strings would be silently truncated.
-- Don't move WiFi/prefs types out of `enc_types.h`; they are referenced by
-  both this component and any app that uses the captive portal form.
+- Don't move WiFi/prefs types out of `wifi_types.h` (ESP32WiFi2); they are
+  referenced by both layers and any app that uses the captive portal form.
 - Don't touch `.git/` or rewrite history.
