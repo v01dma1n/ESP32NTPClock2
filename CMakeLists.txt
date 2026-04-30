@@ -3,7 +3,7 @@
 # IDF-native port of https://github.com/v01dma1n/ESP32NTPClock.
 # Provides the base clock app (BaseNtpClockApp), the IDisplayDriver /
 # IAnimation interfaces, the animation library, the FSM, the scene
-# manager, NTP/geo helpers, weather client, and the quote engine.
+# manager, NTP/geo helpers, and weather client.
 #
 # WiFi connectivity and NVS preferences live in the esp32_wifi component
 # (ESP32WiFi2), which this component depends on.
@@ -21,7 +21,6 @@ idf_component_register(
         "src/anim_scrolling_text.cpp"
         "src/anim_slot_machine.cpp"
         "src/anim_matrix.cpp"
-        "src/quote_manager.cpp"
         "src/i_display_driver.cpp"
     INCLUDE_DIRS
         "include"

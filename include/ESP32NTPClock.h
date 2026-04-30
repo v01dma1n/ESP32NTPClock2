@@ -36,5 +36,3 @@
 #include "anim_scrolling_text.h"
 #include "anim_slot_machine.h"
 #include "anim_matrix.h"
-
-#include "quote_manager.h"
