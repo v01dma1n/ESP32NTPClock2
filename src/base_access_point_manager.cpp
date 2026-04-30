@@ -70,7 +70,7 @@ BaseAccessPointManager::~BaseAccessPointManager() {
 }
 
 void BaseAccessPointManager::setup(const char* hostName) {
-    _pageTitle = hostName ? hostName : "mood-whisperer";
+    _pageTitle = hostName ? hostName : "esp32-clock";
 
     // Make sure the logLevel string mirror reflects the current int enum
     // before rendering.
