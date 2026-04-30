@@ -15,6 +15,8 @@
 #include "i_display_driver.h"
 #include "i_animation.h"
 #include "i_base_clock.h"
+#include "i_weather_clock.h"
+#include "weather_manager.h"
 
 #include "base_preferences.h"
 #include "base_access_point_manager.h"
