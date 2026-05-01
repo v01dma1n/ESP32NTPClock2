@@ -18,8 +18,6 @@
 
 class IBaseClock;
 
-static constexpr int MAX_SCENE_TEXT_LEN = 64;
-
 class SceneManager {
 public:
     explicit SceneManager(IBaseClock& clock);
