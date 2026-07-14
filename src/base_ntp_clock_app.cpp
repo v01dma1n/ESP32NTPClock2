@@ -8,6 +8,13 @@
 
 #include "logging.h"
 
+#include "esp_timer.h"
+
+// Double-reset detection window. A second reset within this many
+// microseconds of boot requests AP mode; after it elapses the boot
+// counts as stable and the flag is cleared.
+static constexpr int64_t DOUBLE_RESET_WINDOW_US = 10 * 1000 * 1000;
+
 BaseNtpClockApp::BaseNtpClockApp()
     : _prefs(nullptr), _apManager(nullptr) {}
 
@@ -51,14 +58,21 @@ void BaseNtpClockApp::loop() {
     if (_fsmManager)   _fsmManager->update();
     if (_sceneManager) _sceneManager->update();
 
-    // After a few seconds of stable RUNNING_NORMAL, clear the "recent
-    // boot" flag so the next isolated reset won't be seen as the 2nd of
-    // a pair. Using a static to keep boot_manager.h dependency-free.
-    static int64_t s_markedAtMs = 0;
-    if (_bootManager && _fsmManager &&
-        _fsmManager->isInState("RUNNING_NORMAL") &&
-        s_markedAtMs == 0) {
-        s_markedAtMs = 1;  // latch
-        _bootManager->markBootStable();
+    // Clear the "recent boot" flag once the double-reset window has
+    // elapsed, or as soon as the FSM commits to AP mode — whichever
+    // comes first. Clearing used to wait for RUNNING_NORMAL, which
+    // meant any boot that never got there (WiFi outage, NTP timeout,
+    // crash) left the flag armed and forced every subsequent power-up
+    // straight back into AP mode. The AP_MODE case matters because
+    // the captive portal loop blocks forever; this is the last loop()
+    // pass that can run before it does.
+    static bool s_bootMarkedStable = false;
+    if (_bootManager && !s_bootMarkedStable) {
+        bool windowElapsed = esp_timer_get_time() >= DOUBLE_RESET_WINDOW_US;
+        bool committedToAp = _fsmManager && _fsmManager->isInState("AP_MODE");
+        if (windowElapsed || committedToAp) {
+            s_bootMarkedStable = true;
+            _bootManager->markBootStable();
+        }
     }
 }

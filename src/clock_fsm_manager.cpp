@@ -59,6 +59,10 @@ void ClockFsmManager::update() {
     if (_forceAp && _state != FSM_AP_MODE) {
         _forceAp = false;
         enter(FSM_AP_MODE);
+        // Return before the AP_MODE case below blocks forever in the
+        // captive portal, so the app's loop() gets one pass to observe
+        // the transition (it clears the double-reset flag on it).
+        return;
     }
 
     int64_t elapsedMs = (esp_timer_get_time() - _stateEnteredUs) / 1000;
