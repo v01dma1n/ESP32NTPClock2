@@ -1,9 +1,9 @@
 # ESP32 NTP Clock engine component.
 #
 # IDF-native port of https://github.com/v01dma1n/ESP32NTPClock.
-# Provides the base clock app (BaseNtpClockApp), the IDisplayDriver /
-# IAnimation interfaces, the animation library, the FSM, the scene
-# manager, NTP/geo helpers, and weather client.
+# Provides BaseNtpClockApp, the IDisplayDriver / IAnimation interfaces,
+# the animation library, the FSM, the scene manager, NTP/geo helpers,
+# and the weather client + WeatherManager polling layer.
 #
 # WiFi connectivity and NVS preferences live in the esp32_wifi component
 # (ESP32WiFi2), which this component depends on.
@@ -17,6 +17,7 @@ idf_component_register(
         "src/sntp_client.cpp"
         "src/geo_tz_client.cpp"
         "src/weather_client.cpp"
+        "src/weather_manager.cpp"
         "src/anim_static_text.cpp"
         "src/anim_scrolling_text.cpp"
         "src/anim_slot_machine.cpp"
@@ -26,11 +27,7 @@ idf_component_register(
         "include"
     REQUIRES
         esp32_wifi
-        nvs_flash
-        esp_wifi
         esp_http_client
-        esp_netif
-        esp_event
         esp_timer
         esp_hw_support
         lwip

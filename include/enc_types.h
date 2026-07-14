@@ -1,12 +1,15 @@
-// enc_types.h — display-specific enums and structs used by the clock engine.
+// enc_types.h — clock-layer enums and structs used by the engine and apps.
+// Mirrors the Arduino-version file of the same name in ESP32NTPClock,
+// but with Arduino dependencies (String) removed.
 //
-// WiFi/preferences types (FormField, PrefSelectOption, AppLogLevel, …) now
-// live in ESP32WiFi2's wifi_types.h, which is included here so existing
-// code that includes enc_types.h directly keeps compiling unchanged.
+// WiFi/preferences types (FormField, PrefSelectOption, AppLogLevel, PrefType,
+// FieldValidation) live in wifi_types.h (ESP32WiFi2) and are re-exported
+// from there, so existing code that includes enc_types.h directly keeps
+// compiling unchanged.
 
 #pragma once
 
-#include "wifi_types.h"   // re-exports FormField, AppLogLevel, PrefType, etc.
+#include "wifi_types.h"
 
 #include <cstdint>
 
