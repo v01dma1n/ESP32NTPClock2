@@ -28,9 +28,14 @@ void BaseNtpClockApp::setup() {
         _prefs->getPreferences();
         _prefs->dumpPreferences();
 
-        // Propagate loaded log level to the global.
+        // Propagate loaded log level to the global, and raise esp_log's
+        // per-tag level to match — LOGDBG maps to ESP_LOGD, which the
+        // IDF-side runtime filter drops at its default INFO level even
+        // when g_appLogLevel says DEBUG.
         extern AppLogLevel g_appLogLevel;
         g_appLogLevel = _prefs->getConfig().logLevel;
+        esp_log_level_set(LOG_TAG, g_appLogLevel >= APP_LOG_DEBUG
+                                       ? ESP_LOG_DEBUG : ESP_LOG_INFO);
     }
 
     // App-specific hardware init (SPI, display, I2C...).
