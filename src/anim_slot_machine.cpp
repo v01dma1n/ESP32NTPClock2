@@ -5,14 +5,14 @@
 #include "esp_random.h"
 
 SlotMachineAnimation::SlotMachineAnimation(std::string targetText,
-                                           uint32_t lockDelay,
+                                           uint32_t maxSpinMs,
                                            uint32_t spinDelay,
                                            bool dotsWithPreviousChar)
     : _targetText(std::move(targetText)),
-      _lockDelay(lockDelay),
+      _maxSpinMs(maxSpinMs),
       _spinDelay(spinDelay),
       _dotsWithPreviousChar(dotsWithPreviousChar),
-      _lastLockTime(0),
+      _startTime(0),
       _lastSpinTime(0),
       _done(false),
       _rngState(esp_random() | 1u) {}
@@ -33,13 +33,12 @@ void SlotMachineAnimation::setup(IDisplayDriver* display) {
         _dotStates.resize(cells);
     }
 
-    _spinningIndices.clear();
-    for (int i = 0; i < cells; ++i) _spinningIndices.push_back(i);
+    _locked.assign(cells, false);
 
     uint32_t now = app_millis();
-    _lastLockTime = now;
+    _startTime    = now;
     _lastSpinTime = now;
-    _done = false;
+    _done = (cells == 0);
 }
 
 char SlotMachineAnimation::randomChar() {
@@ -48,43 +47,44 @@ char SlotMachineAnimation::randomChar() {
     x ^= x << 13; x ^= x >> 17; x ^= x << 5;
     _rngState = x;
 
-    // Printable ASCII between 0x30 ('0') and 0x5A ('Z') gives digits
-    // + uppercase letters, exactly the glyphs a VFD font reliably has.
-    return static_cast<char>(0x30 + (x % ('Z' - '0' + 1)));
+    // Full printable ASCII (space through '~'). Since a cell only locks
+    // when a draw actually matches its target, the pool has to cover
+    // every character real scenes use — space, '/', '-', '.', lowercase
+    // (e.g. "Jul") — not just digits/uppercase, or those targets could
+    // never win by chance and would always fall back to maxSpinMs.
+    constexpr char kMin = ' ';   // 0x20
+    constexpr char kMax = '~';   // 0x7E
+    constexpr int  kSize = kMax - kMin + 1;
+    return static_cast<char>(kMin + (x % kSize));
 }
 
 void SlotMachineAnimation::update() {
     if (_done) return;
 
     uint32_t now = app_millis();
+    if (now - _lastSpinTime < _spinDelay) return;
+    _lastSpinTime = now;
 
-    // Periodically lock the next spinning cell to its target character.
-    if (now - _lastLockTime >= _lockDelay && !_spinningIndices.empty()) {
-        int idx = _spinningIndices.front();
-        _spinningIndices.pop_front();
+    bool pastDeadline = (now - _startTime) >= _maxSpinMs;
+    bool allLocked = true;
 
-        setChar(idx,
-                _parsedText[idx],
-                _dotStates[idx] != 0);
+    for (size_t i = 0; i < _parsedText.size(); ++i) {
+        if (_locked[i]) continue;
 
-        _lastLockTime = now;
-    }
-
-    // All other (still spinning) cells pick fresh random characters.
-    if (now - _lastSpinTime >= _spinDelay) {
-        for (int idx : _spinningIndices) {
-            setChar(idx, randomChar(), false);
-        }
-        _lastSpinTime = now;
-    }
-
-    if (_spinningIndices.empty()) {
-        // Final frame: make sure the target (with dots) is fully drawn.
-        for (size_t i = 0; i < _parsedText.size(); ++i) {
+        char c = randomChar();
+        if (c == _parsedText[i] || pastDeadline) {
+            // Natural match, or the safety net ran out — either way this
+            // cell is done; if it's the safety net, show the real target
+            // instead of whatever the last random draw happened to be.
             setChar(static_cast<int>(i), _parsedText[i], _dotStates[i] != 0);
+            _locked[i] = true;
+        } else {
+            setChar(static_cast<int>(i), c, false);
+            allLocked = false;
         }
-        _done = true;
     }
+
+    if (allLocked) _done = true;
 }
 
 bool SlotMachineAnimation::isDone() { return _done; }
