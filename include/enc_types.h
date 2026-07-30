@@ -26,7 +26,9 @@ enum AnimationType {
     STATIC_TEXT,
     SLOT_MACHINE,
     MATRIX,
-    SCROLLING
+    SCROLLING,
+    SLIDER,
+    SPLIT_FLAP
 };
 
 // One entry in an application's scene playlist. The scene manager cycles

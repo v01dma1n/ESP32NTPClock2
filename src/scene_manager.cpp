@@ -7,6 +7,8 @@
 #include "anim_scrolling_text.h"
 #include "anim_slot_machine.h"
 #include "anim_matrix.h"
+#include "anim_slider.h"
+#include "anim_split_flap.h"
 #include "anim_time.h"
 #include "logging.h"
 
@@ -115,6 +117,15 @@ void SceneManager::startCurrentScene() {
             anim = std::make_unique<MatrixAnimation>(
                 text, scene.anim_param_1, scene.anim_param_2,
                 scene.dots_with_previous);
+            break;
+        case SLIDER:
+            anim = std::make_unique<SliderAnimation>(
+                text, scene.anim_param_1, scene.anim_param_2,
+                scene.dots_with_previous);
+            break;
+        case SPLIT_FLAP:
+            anim = std::make_unique<SplitFlapAnimation>(
+                text, scene.anim_param_1, scene.dots_with_previous);
             break;
         case SLOT_MACHINE:
         default:

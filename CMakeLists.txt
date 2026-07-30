@@ -22,6 +22,8 @@ idf_component_register(
         "src/anim_scrolling_text.cpp"
         "src/anim_slot_machine.cpp"
         "src/anim_matrix.cpp"
+        "src/anim_slider.cpp"
+        "src/anim_split_flap.cpp"
         "src/i_display_driver.cpp"
     INCLUDE_DIRS
         "include"
