@@ -20,6 +20,13 @@ void WeatherManager::update() {
 
     if (!apiKey || !*apiKey || !city || !*city) {
         LOGINF("OWM not configured — skipping weather fetch");
+        // Explicitly invalidate rather than leaving _data untouched: if a
+        // key was configured and fetched successfully at some point in
+        // this boot and then cleared (or the city was blanked), _data
+        // would otherwise keep reporting stale valid=true readings
+        // forever, since update() only reruns fetchWeather() when both
+        // fields are non-empty.
+        _data.valid = false;
         return;
     }
 
