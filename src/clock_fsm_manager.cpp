@@ -71,7 +71,7 @@ void ClockFsmManager::update() {
         case FSM_STARTUP_ANIM: {
             // Run the splash animation for ~2s, then move on. The app
             // queued the actual StaticTextAnimation in its setup().
-            if (elapsedMs > 2000 || !_clock.getClock().isAnimationRunning()) {
+            if (elapsedMs > _clock.startupAnimMs() || !_clock.getClock().isAnimationRunning()) {
                 enter(FSM_WIFI_CONNECT);
             }
             break;

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <ctime>
 
 class DisplayManager;
@@ -48,4 +49,9 @@ public:
     // True if an external RTC was present and had valid time at boot, meaning
     // the system clock is already set and NTP failure is non-fatal.
     virtual bool hasRtcTime() const { return false; }
+
+    // How long FSM_STARTUP_ANIM holds before moving on to FSM_WIFI_CONNECT
+    // (see ClockFsmManager::update()). 2s suits a short single-line splash;
+    // apps with a longer/multi-line banner can override.
+    virtual int64_t startupAnimMs() const { return 2000; }
 };
